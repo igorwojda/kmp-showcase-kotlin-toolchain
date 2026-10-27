@@ -1,5 +1,6 @@
 /build/
-.idea/
+.idea/*
+!.idea/icon.svg
 **/module.xcodeproj/*
 !**/module.xcodeproj/project.pbxproj
 !**/module.xcodeproj/xcshareddata/
