@@ -4,3 +4,8 @@ product: ios/app
 dependencies:
   # Features shipped in the app
   - ../feature/forecast
+
+plugins:
+  detekt: enabled
+  ktlint: enabled
+  swiftlint: enabled

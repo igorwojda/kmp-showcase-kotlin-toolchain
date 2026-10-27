@@ -106,6 +106,8 @@ project structure stability and production-readiness.
 **Build:**
 - **[Kotlin Toolchain](https://kotlin-toolchain.org/latest/)** - Declarative `module.yaml` build config, self-bootstrapping
   `./kotlin` wrapper
+  - **[Plugins](https://kotlin-toolchain.org/latest/user-guide/plugins/overview/)** - ktlint, Detekt and SwiftLint
+    checks ([build-logic](./build-logic))
 - **[Version Catalog](https://kotlin-toolchain.org/latest/user-guide/dependencies/)** - Centralized dependency
   versions ([libs.versions.toml](libs.versions.toml))
 
@@ -157,6 +159,8 @@ flowchart LR
   [presentation](./feature/forecast/src@android/presentation) package (`WeeklyForecastScreen`, `DailyForecastScreen`).
 
 * [/feature/base](./feature/base) holds code shared by all feature modules, e.g. `StoreViewModel`.
+
+* [/build-logic](./build-logic) holds the Kotlin Toolchain plugins running the linters (see [Linters and CI](#linters-and-ci)).
 
 ### Feature Module Structure
 
@@ -283,6 +287,7 @@ installation is required.
 ./kotlin run -m androidApp        # Run the Android app (starts an emulator if no device is connected)
 ./kotlin run -m iosApp            # Run the iOS app in the simulator
 ./kotlin test                     # Run tests
+./kotlin check                    # Run tests and linters (see Linters and CI)
 ```
 
 The iOS app can also be opened in Xcode: [iosApp/module.xcodeproj](iosApp/module.xcodeproj). Its `Build Kotlin` build
@@ -463,15 +468,32 @@ placement. Apply it to every destination without exception.
 
 ## Linters and CI
 
-Not migrated yet. The Gradle-based project ran ktlint (Spotless), Detekt, Android Lint, SwiftLint and a GitHub
-Actions pipeline. Their rule files are kept ([.editorconfig](./.editorconfig), [detekt.yml](./detekt.yml),
-[lint.xml](./lint.xml), [.swiftlint.yml](./.swiftlint.yml)) for the Kotlin Toolchain setup that will follow.
+Linters run as [Kotlin Toolchain plugins](https://kotlin-toolchain.org/latest/user-guide/plugins/overview/) from
+[/build-logic](./build-logic), the counterpart of Gradle convention plugins. The toolchain has no project-wide plugins,
+so each module enables the linters it needs in its `module.yaml` (`plugins:` block); each plugin is listed under
+`plugins:` in [project.yaml](project.yaml).
 
-SwiftLint doesn't depend on the build system (install it with `brew install swiftlint`):
+| Linter | Plugin | Rules | Check | Fix |
+|--------|--------|-------|-------|-----|
+| [ktlint](https://pinterest.github.io/ktlint/) + [Compose rules](https://mrmans0n.github.io/compose-rules/) | [build-logic/ktlint](./build-logic/ktlint) | [.editorconfig](./.editorconfig) | `./kotlin check ktlint` | `./kotlin do ktlintApply` |
+| [Detekt](https://detekt.dev/) | [build-logic/detekt](./build-logic/detekt) | [detekt.yml](./detekt.yml) (on top of the defaults) | `./kotlin check detekt` | `./kotlin do detektApply` |
+| [SwiftLint](https://realm.github.io/SwiftLint/) | [build-logic/swiftlint](./build-logic/swiftlint) | [.swiftlint.yml](./.swiftlint.yml) | `./kotlin check swiftlint` | `./kotlin do swiftlintApply` |
 
-```bash
-swiftlint lint --strict
-```
+- ktlint and Detekt run in-process; their versions are in [libs.versions.toml](libs.versions.toml). They are enabled
+  in every Kotlin module, the plugin modules included, and scan the whole module folder (`src`, `src@android`,
+  `src@ios`, `test`). The toolchain's `module.kotlinJavaSources` is empty for Android and KMP modules, so it can't be
+  used.
+- SwiftLint is enabled in `iosApp` and lints `iosApp/src`. The plugin downloads the SwiftLint release pinned in
+  [plugin.yaml](./build-logic/swiftlint/plugin.yaml) and verifies its checksum, so no installation is needed (Linux
+  uses the statically linked binary). Warnings fail the check (`--strict`).
+- Detekt writes HTML and XML reports to `build/tasks/_<module>_detektCheck@detekt/`.
+- `./kotlin check` runs all linters plus the tests; `-m <module>` limits it to one module.
+- Detekt's `InvalidPackageDeclaration` is disabled: toolchain source folders omit the module's package prefix.
+- Android Lint is not migrated yet; its rules are kept in [lint.xml](./lint.xml).
+
+The [Check](./.github/workflows/check.yml) GitHub Actions workflow runs on every pull request and on `main`:
+`Build Android App` (uploads the debug APK), `Build iOS App` (simulator), `Detekt` (uploads the report), `ktlint`
+and `SwiftLint`. Jobs need no JDK setup: the `./kotlin` wrapper provisions everything, cached with `actions/cache`.
 
 ## Debugging FlowMVI
 

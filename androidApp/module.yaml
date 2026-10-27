@@ -36,3 +36,7 @@ settings:
         - /META-INF/{AL2.0,LGPL2.1}
   jvm:
     release: 17
+
+plugins:
+  detekt: enabled
+  ktlint: enabled

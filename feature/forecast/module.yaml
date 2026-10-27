@@ -38,3 +38,7 @@ settings:
     compileSdk: 37
   jvm:
     release: 17
+
+plugins:
+  detekt: enabled
+  ktlint: enabled

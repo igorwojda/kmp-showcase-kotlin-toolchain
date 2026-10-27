@@ -345,7 +345,9 @@ naming:
     parameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
   InvalidPackageDeclaration:
-    active: true
+    # Kotlin Toolchain source folders omit each module's package prefix (`feature/forecast/src/di` holds
+    # `com.igorwojda.showcase.feature.forecast.di`), and the prefix differs per module, so no `rootPackage` fits.
+    active: false
     rootPackage: ''
     requireRootInDeclaration: false
   LambdaParameterNaming:
