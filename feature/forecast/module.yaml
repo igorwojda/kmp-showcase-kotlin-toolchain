@@ -1,0 +1,40 @@
+# Forecast feature: shared data, domain and presentation logic plus the Jetpack Compose UI (src@android).
+# The SwiftUI screens live in the iOS app module (iosApp/src/forecast).
+product:
+  type: kmp/lib
+  platforms: [android, iosArm64, iosSimulatorArm64]
+
+dependencies:
+  - ../base: exported
+  # :feature:base keeps Ktor non-exported, so every module calling the API declares it itself.
+  - $libs.ktor.client.core
+  # Type-safe requests: @Resource classes become URL path + query parameters
+  - $libs.ktor.client.resources
+
+dependencies@android:
+  # Jetpack Compose UI (Android screens)
+  - bom: $libs.androidx.compose.bom
+  - $libs.androidx.compose.runtime
+  - $libs.androidx.compose.foundation
+  - $libs.androidx.compose.material3
+  - $libs.androidx.compose.ui
+  - $libs.androidx.compose.uiToolingPreview
+  # Renders @Preview in the IDE
+  - $libs.androidx.compose.uiTooling: runtime-only
+  - bom: $libs.koin.bom
+  - $libs.koin.androidx.compose
+
+test-dependencies:
+  - $kotlin.test
+
+settings:
+  # Compose can't be enabled per platform, so the compiler also runs on iOS (no Compose UI there).
+  compose: enabled
+  kotlin:
+    serialization: json
+  android:
+    namespace: com.igorwojda.showcase.feature.forecast
+    minSdk: 31
+    compileSdk: 37
+  jvm:
+    release: 17

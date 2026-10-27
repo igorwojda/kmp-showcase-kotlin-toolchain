@@ -1,8 +1,6 @@
+# iOS composition root: builds the Kotlin framework (`import KotlinModules`) the SwiftUI app links, and starts Koin.
 product: ios/app
 
 dependencies:
-  - //shared
-  - $compose.ui
-
-settings:
-  compose: enabled
+  # Features shipped in the app
+  - ../feature/forecast
