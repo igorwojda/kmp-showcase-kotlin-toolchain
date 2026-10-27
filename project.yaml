@@ -1,4 +1,14 @@
 modules:
   - androidApp
+  - build-logic/detekt
+  - build-logic/ktlint
+  - build-logic/swiftlint
+  - feature/base
+  - feature/forecast
   - iosApp
-  - shared
+
+# Linters, enabled per module in module.yaml (`plugins:`)
+plugins:
+  - ./build-logic/detekt
+  - ./build-logic/ktlint
+  - ./build-logic/swiftlint

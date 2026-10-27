@@ -1,0 +1,21 @@
+# - `./kotlin check ktlint` - fails on formatting violations
+# - `./kotlin do ktlintApply` - fixes them in place
+tasks:
+  ktlintCheck:
+    action: !com.igorwojda.showcase.buildlogic.ktlint.ktlint
+      moduleDir: ${module.rootDir}
+      basePath: ${project.rootDir}
+      format: false
+
+  ktlintApply:
+    action: !com.igorwojda.showcase.buildlogic.ktlint.ktlint
+      moduleDir: ${module.rootDir}
+      basePath: ${project.rootDir}
+      format: true
+
+checks:
+  - name: ktlint
+    performedBy: ktlintCheck
+
+commands:
+  - ktlintApply

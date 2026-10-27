@@ -1,0 +1,14 @@
+# ktlint, enabled per module (`plugins: ktlint: enabled`). Rules are configured in `.editorconfig`.
+product: jvm/amper-plugin
+
+dependencies:
+  - $libs.ktlint.ruleEngine
+  - $libs.ktlint.rulesetStandard
+  # Jetpack Compose rules on top of the standard ktlint rules
+  - $libs.composeRules.ktlint
+  # ktlint logs through SLF4J, which has no binding outside the ktlint CLI
+  - $libs.slf4j.nop
+
+plugins:
+  detekt: enabled
+  ktlint: enabled

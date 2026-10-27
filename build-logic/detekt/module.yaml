@@ -1,0 +1,11 @@
+# Detekt static analysis, enabled per module (`plugins: detekt: enabled`). Rules are configured in `detekt.yml`.
+product: jvm/amper-plugin
+
+dependencies:
+  - $libs.detekt.cli
+  # AnalysisResult returned by detekt-cli's CliRunner
+  - $libs.detekt.tooling
+
+plugins:
+  detekt: enabled
+  ktlint: enabled

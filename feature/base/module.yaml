@@ -1,0 +1,51 @@
+# Code shared by all feature modules. Every feature module depends on it, so shared libraries are exported.
+product:
+  type: kmp/lib
+  platforms: [android, iosArm64, iosSimulatorArm64]
+
+dependencies:
+  # Presentation (MVI)
+  - $libs.androidx.lifecycle.viewmodel: exported
+  - $libs.kmp.observableviewmodel.core: exported
+  - $libs.flowmvi.compose: exported
+  # Remote debugger (IDE plugin / desktop app). Ships in release builds too.
+  - $libs.flowmvi.debugger: exported
+  - $libs.kotlinx.coroutines: exported
+  - $libs.kotlinx.datetime: exported
+
+  # DI
+  - bom: $libs.koin.bom
+  - $libs.koin.core: exported
+  - $libs.koin.core.viewmodel: exported
+
+  # Network. Kept non-exported so the Ktor types stay out of the module API;
+  # feature modules that call the API declare Ktor themselves.
+  - $libs.ktor.client.core
+  - $libs.ktor.client.content.negotiation
+  # Type-safe requests: @Resource classes become URL path + query parameters
+  - $libs.ktor.client.resources
+  - $libs.ktor.serialization.kotlinx.json
+
+dependencies@android:
+  # Provides the Android engine for Ktor
+  - $libs.ktor.client.android
+  # androidContext() / androidLogger(), used by the app module when starting Koin
+  - $libs.koin.android: exported
+
+dependencies@ios:
+  # Provides the Darwin engine for Ktor
+  - $libs.ktor.client.darwin
+
+settings:
+  kotlin:
+    serialization: json
+  android:
+    namespace: com.igorwojda.showcase.feature.base
+    minSdk: 31
+    compileSdk: 37
+  jvm:
+    release: 17
+
+plugins:
+  detekt: enabled
+  ktlint: enabled

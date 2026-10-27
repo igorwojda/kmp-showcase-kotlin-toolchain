@@ -10,6 +10,9 @@
         <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
+        <!-- Name shown on the home screen -->
+        <key>CFBundleDisplayName</key>
+        <string>KMP Showcase</string>
         <key>CFBundleName</key>
         <string>$(PRODUCT_NAME)</string>
         <key>CFBundlePackageType</key>

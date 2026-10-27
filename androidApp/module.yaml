@@ -1,13 +1,42 @@
 product: android/app
 
 dependencies:
-  - //shared
+  # Features shipped in the app
+  - ../feature/forecast
+
+  # Jetpack Compose UI
+  - bom: $libs.androidx.compose.bom
   - $libs.androidx.activity.compose
-  - $compose.preview
-  - $compose.uiTooling
+  - $libs.androidx.compose.runtime
+  - $libs.androidx.compose.foundation
+  - $libs.androidx.compose.material3
+  - $libs.androidx.compose.ui
+  - $libs.androidx.compose.uiToolingPreview
+  - $libs.androidx.compose.uiTooling: runtime-only
+  - $libs.androidx.lifecycle.runtimeCompose
+  - $libs.androidx.lifecycle.viewmodelCompose
+  - $libs.androidx.lifecycle.viewmodelNavigation3
+  - $libs.androidx.navigation3.runtime
+  - $libs.androidx.navigation3.ui
 
 settings:
   compose: enabled
+  kotlin:
+    serialization: json
   android:
     namespace: com.igorwojda.showcase
     applicationId: com.igorwojda.showcase
+    versionCode: 1
+    versionName: "1.0"
+    minSdk: 31
+    compileSdk: 37
+    targetSdk: 37
+    resourcePackaging:
+      excludes:
+        - /META-INF/{AL2.0,LGPL2.1}
+  jvm:
+    release: 17
+
+plugins:
+  detekt: enabled
+  ktlint: enabled

@@ -1,0 +1,6 @@
+# SwiftLint, enabled in the iOS app module (`plugins: swiftlint: enabled`). Rules are configured in `.swiftlint.yml`.
+product: jvm/amper-plugin
+
+plugins:
+  detekt: enabled
+  ktlint: enabled

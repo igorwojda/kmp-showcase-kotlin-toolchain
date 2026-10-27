@@ -1,0 +1,134 @@
+name: Check
+
+on:
+  push:
+    branches: [ main ] # Just in case main was not up to date while merging PR
+  pull_request:
+    types: [ opened, synchronize ]
+
+# Cancel previous runs on new push
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# The ./kotlin wrapper provisions its own JRE, toolchain and tools, so no JDK or Gradle setup is needed
+env:
+  KOTLIN_CLI_NO_WELCOME_BANNER: 1
+
+jobs:
+  build-android:
+    name: Build Android App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Toolchain distribution, Maven dependencies and downloaded tools
+      - name: Cache Kotlin Toolchain
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/JetBrains/Kotlin
+          key: kotlin-android-${{ runner.os }}-${{ hashFiles('kotlin', 'libs.versions.toml', '**/module.yaml') }}
+          restore-keys: kotlin-android-${{ runner.os }}-
+
+      - name: Build App
+        run: ./kotlin build -m androidApp
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-app-debug
+          path: build/tasks/_androidApp_buildAndroidDebug/gradle-project-debug.apk
+
+  build-ios:
+    name: Build iOS App
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      # Toolchain distribution, Maven dependencies and Kotlin/Native
+      - name: Cache Kotlin Toolchain
+        uses: actions/cache@v6
+        with:
+          path: ~/Library/Caches/JetBrains/Kotlin
+          key: kotlin-ios-${{ runner.os }}-${{ hashFiles('kotlin', 'libs.versions.toml', '**/module.yaml') }}
+          restore-keys: kotlin-ios-${{ runner.os }}-
+
+      # Kotlin/Native LLVM and the stdlib/platform library caches it builds on the first link (several silent minutes).
+      # The Kotlin/Native version comes from the toolchain version pinned in the wrapper.
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('kotlin') }}
+          restore-keys: konan-${{ runner.os }}-
+
+      # Simulator build: no signing needed
+      - name: Build App
+        timeout-minutes: 45 # Fail a hung build instead of waiting for the 6h job limit
+        run: ./kotlin build -m iosApp -p iosSimulatorArm64
+
+  detekt:
+    name: Detekt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Cache Kotlin Toolchain
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/JetBrains/Kotlin
+          key: kotlin-detekt-${{ runner.os }}-${{ hashFiles('kotlin', 'libs.versions.toml', '**/module.yaml') }}
+          restore-keys: kotlin-detekt-${{ runner.os }}-
+
+      - name: Run Detekt
+        run: ./kotlin check detekt
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v7
+        if: always() # Upload the report also when Detekt finds issues
+        with:
+          name: detekt-report
+          path: build/tasks/*_detektCheck@detekt/
+
+  ktlint:
+    name: ktlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Cache Kotlin Toolchain
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/JetBrains/Kotlin
+          key: kotlin-ktlint-${{ runner.os }}-${{ hashFiles('kotlin', 'libs.versions.toml', '**/module.yaml') }}
+          restore-keys: kotlin-ktlint-${{ runner.os }}-
+
+      - name: Run ktlint
+        run: ./kotlin check ktlint
+
+  swiftlint:
+    name: SwiftLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Cache Kotlin Toolchain
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/JetBrains/Kotlin
+          key: kotlin-swiftlint-${{ runner.os }}-${{ hashFiles('kotlin', 'libs.versions.toml', '**/module.yaml') }}
+          restore-keys: kotlin-swiftlint-${{ runner.os }}-
+
+      # Downloads the pinned SwiftLint release (statically linked Linux binary). Warnings fail the job too.
+      - name: Run SwiftLint
+        run: ./kotlin check swiftlint

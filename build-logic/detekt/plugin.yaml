@@ -1,0 +1,25 @@
+# - `./kotlin check detekt` - fails on rule violations, writes HTML and XML reports
+# - `./kotlin do detektApply` - also fixes auto-correctable violations in place
+tasks:
+  detektCheck:
+    action: !com.igorwojda.showcase.buildlogic.detekt.detekt
+      moduleDir: ${module.rootDir}
+      config: ${project.rootDir}/detekt.yml
+      basePath: ${project.rootDir}
+      reportDir: ${taskOutputDir}
+      autoCorrect: false
+
+  detektApply:
+    action: !com.igorwojda.showcase.buildlogic.detekt.detekt
+      moduleDir: ${module.rootDir}
+      config: ${project.rootDir}/detekt.yml
+      basePath: ${project.rootDir}
+      reportDir: ${taskOutputDir}
+      autoCorrect: true
+
+checks:
+  - name: detekt
+    performedBy: detektCheck
+
+commands:
+  - detektApply

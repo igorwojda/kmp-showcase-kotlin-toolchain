@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
+   LastUpgradeVersion = "1640"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      buildArchitectures = "Automatic">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -14,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "EBADC742E15BFA0F64A10094"
-               BuildableName = "kmp-showcase-kotlin-toolchain.app"
+               BuildableName = "Kmpshowcase.app"
                BlueprintName = "app"
                ReferencedContainer = "container:module.xcodeproj">
             </BuildableReference>
@@ -27,6 +29,8 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
+      <Testables>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -43,7 +47,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "EBADC742E15BFA0F64A10094"
-            BuildableName = "kmp-showcase-kotlin-toolchain.app"
+            BuildableName = "Kmpshowcase.app"
             BlueprintName = "app"
             ReferencedContainer = "container:module.xcodeproj">
          </BuildableReference>
@@ -55,6 +59,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "EBADC742E15BFA0F64A10094"
+            BuildableName = "Kmpshowcase.app"
+            BlueprintName = "app"
+            ReferencedContainer = "container:module.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
