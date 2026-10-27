@@ -479,13 +479,14 @@ so each module enables the linters it needs in its `module.yaml` (`plugins:` blo
 | [Detekt](https://detekt.dev/) | [build-logic/detekt](./build-logic/detekt) | [detekt.yml](./detekt.yml) (on top of the defaults) | `./kotlin check detekt` | `./kotlin do detektApply` |
 | [SwiftLint](https://realm.github.io/SwiftLint/) | [build-logic/swiftlint](./build-logic/swiftlint) | [.swiftlint.yml](./.swiftlint.yml) | `./kotlin check swiftlint` | `./kotlin do swiftlintApply` |
 
-- ktlint and Detekt run in-process; their versions are in [libs.versions.toml](libs.versions.toml). They are enabled
+- All linter versions are in [libs.versions.toml](libs.versions.toml). ktlint and Detekt run in-process. They are enabled
   in every Kotlin module, the plugin modules included, and scan the whole module folder (`src`, `src@android`,
   `src@ios`, `test`). The toolchain's `module.kotlinJavaSources` is empty for Android and KMP modules, so it can't be
   used.
-- SwiftLint is enabled in `iosApp` and lints `iosApp/src`. The plugin downloads the SwiftLint release pinned in
-  [plugin.yaml](./build-logic/swiftlint/plugin.yaml) and verifies its checksum, so no installation is needed (Linux
-  uses the statically linked binary). Warnings fail the check (`--strict`).
+- SwiftLint is enabled in `iosApp` and lints `iosApp/src`. The plugin downloads the release set by `swiftlint` in
+  `libs.versions.toml` and verifies it against the checksums in [plugin.yaml](./build-logic/swiftlint/plugin.yaml)
+  (update both together), so no installation is needed (Linux uses the statically linked binary). Warnings fail the
+  check (`--strict`).
 - Detekt writes HTML and XML reports to `build/tasks/_<module>_detektCheck@detekt/`.
 - `./kotlin check` runs all linters plus the tests; `-m <module>` limits it to one module.
 - Detekt's `InvalidPackageDeclaration` is disabled: toolchain source folders omit the module's package prefix.
@@ -493,7 +494,8 @@ so each module enables the linters it needs in its `module.yaml` (`plugins:` blo
 
 The [Check](./.github/workflows/check.yml) GitHub Actions workflow runs on every pull request and on `main`:
 `Build Android App` (uploads the debug APK), `Build iOS App` (simulator), `Detekt` (uploads the report), `ktlint`
-and `SwiftLint`. Jobs need no JDK setup: the `./kotlin` wrapper provisions everything, cached with `actions/cache`.
+and `SwiftLint`. Jobs need no JDK setup: the `./kotlin` wrapper provisions everything, cached with `actions/cache`
+(the iOS job also caches `~/.konan`: a cold Kotlin/Native link builds its caches silently for several minutes).
 
 ## Debugging FlowMVI
 

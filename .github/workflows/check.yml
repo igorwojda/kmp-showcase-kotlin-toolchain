@@ -60,8 +60,18 @@ jobs:
           key: kotlin-ios-${{ runner.os }}-${{ hashFiles('kotlin', 'libs.versions.toml', '**/module.yaml') }}
           restore-keys: kotlin-ios-${{ runner.os }}-
 
+      # Kotlin/Native LLVM and the stdlib/platform library caches it builds on the first link (several silent minutes).
+      # The Kotlin/Native version comes from the toolchain version pinned in the wrapper.
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('kotlin') }}
+          restore-keys: konan-${{ runner.os }}-
+
       # Simulator build: no signing needed
       - name: Build App
+        timeout-minutes: 45 # Fail a hung build instead of waiting for the 6h job limit
         run: ./kotlin build -m iosApp -p iosSimulatorArm64
 
   detekt:
