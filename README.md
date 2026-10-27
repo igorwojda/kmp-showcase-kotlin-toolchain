@@ -7,7 +7,7 @@ feature modules, the UI is native on each platform.
 Ths app uses [Kotlin Toolchain](https://kotlin-toolchain.org/latest/) as build system. [Gradle](https://gradle.org/) equivalent can 
 be found in [kmp-showcase](https://github.com/igorwojda/kmp-showcase) repository.
 
-- [💎 KMP Showcase](#-kmp-showcase)
+- [💎 KMP Showcase (Kotlin Toolchain)](#-kmp-showcase-kotlin-toolchain)
   - [Application Scope](#application-scope)
   - [Tech-Stack](#tech-stack)
   - [Architecture](#architecture)
