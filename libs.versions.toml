@@ -20,6 +20,8 @@ ktlint = "1.8.0"
 # Jetpack Compose ktlint rules, run next to the standard ktlint rules
 composeRules = "0.6.8"
 slf4j = "2.0.20"
+# Not a Maven artifact: build-logic/swiftlint downloads this release. Update the checksums in its plugin.yaml too.
+swiftlint = "0.65.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }

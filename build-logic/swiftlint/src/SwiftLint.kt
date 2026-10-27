@@ -13,23 +13,34 @@ import java.util.zip.ZipInputStream
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
+import kotlin.io.path.exists
 import kotlin.io.path.outputStream
 import kotlin.io.path.pathString
+import kotlin.io.path.readLines
+import kotlin.io.path.readText
 import kotlin.io.path.setPosixFilePermissions
+import kotlin.io.path.writeText
 
 private const val EXECUTABLE = "swiftlint"
 
 /**
- * Downloads the SwiftLint release for the host and verifies its checksum. The keys of [sha256] are `macos`,
- * `linuxAmd64` and `linuxArm64`. Linux uses the statically linked binary, which runs without a Swift installation.
+ * Downloads the SwiftLint release set by [versionAlias] in the `[versions]` table of [versionCatalog] and verifies its
+ * checksum. The keys of [sha256] are `macos`, `linuxAmd64` and `linuxArm64`. Linux uses the statically linked binary,
+ * which runs without a Swift installation.
  */
 @TaskAction
 @OptIn(ExperimentalPathApi::class)
 fun installSwiftLint(
-    version: String,
+    @Input versionCatalog: Path,
+    versionAlias: String,
     sha256: Map<String, String>,
     @Output installDir: Path,
 ) {
+    val version = catalogVersion(versionCatalog, versionAlias)
+    // The task reruns on any catalog change; skip the download when the SwiftLint version is the same
+    val versionFile = installDir.resolve("version")
+    if (versionFile.exists() && versionFile.readText() == version) return
+
     val os = System.getProperty("os.name").lowercase()
     val arm = System.getProperty("os.arch") in setOf("aarch64", "arm64")
     val (platform, asset, binary) =
@@ -58,6 +69,24 @@ fun installSwiftLint(
         executable.outputStream().use { entries.copyTo(it) }
     }
     executable.setPosixFilePermissions(PosixFilePermissions.fromString("rwxr-xr-x"))
+    versionFile.writeText(version)
+}
+
+/** Reads `alias = "version"` from the `[versions]` table of a Gradle version catalog. */
+private fun catalogVersion(
+    versionCatalog: Path,
+    alias: String,
+): String {
+    val versions =
+        versionCatalog
+            .readLines()
+            .map { it.substringBefore('#').trim() }
+            .dropWhile { it != "[versions]" }
+            .drop(1)
+            .takeWhile { !it.startsWith("[") }
+    val entry = Regex("""^${Regex.escape(alias)}\s*=\s*"([^"]+)"$""")
+    return versions.firstNotNullOfOrNull { entry.find(it)?.groupValues?.get(1) }
+        ?: error("Version `$alias` not found in the [versions] table of $versionCatalog")
 }
 
 /** Runs SwiftLint from [installDir] over [sourceDir]. Warnings fail the task too (`--strict`). */
