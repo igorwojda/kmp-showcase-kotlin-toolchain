@@ -113,6 +113,8 @@ project structure stability and production-readiness.
     checks ([build-logic](./build-logic))
 - **[Version Catalog](https://kotlin-toolchain.org/latest/user-guide/dependencies/)** - Centralized dependency
   versions ([libs.versions.toml](libs.versions.toml))
+- **[Renovate](https://docs.renovatebot.com/)** - Automated dependency update PRs (see
+  [Dependency Management](#dependency-management))
 
 ## Architecture
 
@@ -301,6 +303,12 @@ phase builds the Kotlin framework.
 [libs.versions.toml](libs.versions.toml) holds library versions in the Gradle version catalog format (`[versions]` and
 `[libraries]` sections only), referenced from `module.yaml` as `$libs.<alias>`. BOMs are imported with `bom:` (Compose,
 Koin). Kotlin, Compose Multiplatform and kotlinx-serialization versions come from the toolchain's defaults.
+
+[Renovate](https://docs.renovatebot.com/) ([renovate.json](renovate.json)) opens pull requests for new versions of the
+version catalog libraries and GitHub Actions. Non-major updates merge automatically once the required CI checks pass;
+major updates wait for a manual merge. It does not update the Kotlin Toolchain version in the [kotlin](kotlin)
+wrapper or `swiftlint` (no library references it, and its checksums live in
+[plugin.yaml](build-logic/swiftlint/plugin.yaml)); bump those by hand.
 
 ### Xcode Project
 
