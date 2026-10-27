@@ -1,8 +1,11 @@
-# 💎 KMP Showcase
+# 💎 KMP Showcase (Kotlin Toolchain)
 
 A [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html) sample application 
 demonstrating how to share code for Android and iOS. The data, domain and presentation logic live in common Kotlin 
 feature modules, the UI is native on each platform.
+
+Ths app uses [Kotlin Toolchain](https://kotlin-toolchain.org/latest/) as build system. [Gradle](https://gradle.org/) equivalent can 
+be found in [kmp-showcase](https://github.com/igorwojda/kmp-showcase) repository.
 
 - [💎 KMP Showcase](#-kmp-showcase)
   - [Application Scope](#application-scope)
