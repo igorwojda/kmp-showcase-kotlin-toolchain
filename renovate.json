@@ -1,6 +1,25 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
+  "customManagers": [
+    {
+      "description": "Kotlin Toolchain version in the kotlin and kotlin.bat wrappers.",
+      "customType": "regex",
+      "managerFilePatterns": ["/^kotlin(\\.bat)?$/"],
+      "matchStrings": ["kotlin_cli_version=(?<currentValue>\\d[^\\s]*)"],
+      "depNameTemplate": "org.jetbrains.kotlin:kotlin-cli",
+      "datasourceTemplate": "maven",
+      "registryUrlTemplate": "https://packages.jetbrains.team/maven/p/amper/amper"
+    },
+    {
+      "description": "SwiftLint release downloaded by build-logic/swiftlint (not a Maven artifact).",
+      "customType": "regex",
+      "managerFilePatterns": ["/^libs\\.versions\\.toml$/"],
+      "matchStrings": ["swiftlint = \"(?<currentValue>[^\"]+)\""],
+      "depNameTemplate": "realm/SwiftLint",
+      "datasourceTemplate": "github-releases"
+    }
+  ],
   "packageRules": [
     {
       "description": "Merge non-major updates once the required CI checks pass.",
@@ -8,9 +27,31 @@
       "automerge": true
     },
     {
+      "description": "AndroidX is published only to Google Maven. Without Gradle files Renovate cannot detect google(), so it would only query Maven Central.",
+      "matchPackageNames": ["androidx.**"],
+      "registryUrls": ["https://dl.google.com/android/maven2/"]
+    },
+    {
       "description": "Ktor depends on the -0.6.x-compat variant, so stay on it (see libs.versions.toml).",
       "matchPackageNames": ["org.jetbrains.kotlinx:kotlinx-datetime"],
       "allowedVersions": "/-0\\.6\\.x-compat$/"
+    },
+    {
+      "description": "Skip the Kotlin Toolchain dev and branch builds published to the same repository.",
+      "matchPackageNames": ["org.jetbrains.kotlin:kotlin-cli"],
+      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/"
+    },
+    {
+      "description": "The wrappers pin a SHA-256 checksum that Renovate cannot update, so these PRs need a manual commit.",
+      "matchPackageNames": ["org.jetbrains.kotlin:kotlin-cli"],
+      "automerge": false,
+      "prBodyNotes": ["Renovate only bumps the version; the checksum is now stale. Replace this change by running `./kotlin update --target-version={{{newVersion}}}` and pushing the result to this branch."]
+    },
+    {
+      "description": "plugin.yaml pins SHA-256 checksums of the SwiftLint assets that Renovate cannot update.",
+      "matchPackageNames": ["realm/SwiftLint"],
+      "automerge": false,
+      "prBodyNotes": ["Update the `sha256` checksums in `build-logic/swiftlint/plugin.yaml` (`digest` of the assets at https://api.github.com/repos/realm/SwiftLint/releases/tags/{{{newVersion}}}) and push them to this branch."]
     }
   ]
 }

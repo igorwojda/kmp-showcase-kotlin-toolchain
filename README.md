@@ -306,9 +306,15 @@ Koin). Kotlin, Compose Multiplatform and kotlinx-serialization versions come fro
 
 [Renovate](https://docs.renovatebot.com/) ([renovate.json](renovate.json)) opens pull requests for new versions of the
 version catalog libraries and GitHub Actions. Non-major updates merge automatically once the required CI checks pass;
-major updates wait for a manual merge. It does not update the Kotlin Toolchain version in the [kotlin](kotlin)
-wrapper or `swiftlint` (no library references it, and its checksums live in
-[plugin.yaml](build-logic/swiftlint/plugin.yaml)); bump those by hand.
+major updates wait for a manual merge. AndroidX libraries are looked up on Google Maven, since there are no Gradle
+files for Renovate to read the repositories from.
+
+Renovate also bumps the Kotlin Toolchain version in the [kotlin](kotlin) / [kotlin.bat](kotlin.bat) wrappers and
+`swiftlint` in the version catalog, but these PRs never merge automatically: both pin SHA-256 checksums that Renovate
+cannot update. Fix them on the PR branch before merging:
+
+- Kotlin Toolchain - run `./kotlin update --target-version=<version>`
+- SwiftLint - update the checksums in [plugin.yaml](build-logic/swiftlint/plugin.yaml)
 
 ### Xcode Project
 
