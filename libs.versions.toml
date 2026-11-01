@@ -7,7 +7,7 @@ koin = "4.2.2"
 coroutines = "1.11.0"
 # Ktor depends on the "-0.6.x-compat" variant, which wins resolution over plain "0.8.0" anyway.
 kotlinx-datetime = "0.8.0-0.6.x-compat"
-ktor = "3.6.0"
+ktor = "3.6.1"
 
 # Allows you to use AndroidX/Kotlin ViewModels with SwiftUI
 kmpObservableViewModel = "1.1.0"
