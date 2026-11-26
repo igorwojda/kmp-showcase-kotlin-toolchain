@@ -12,7 +12,7 @@ ktor = "3.6.2"
 # Allows you to use AndroidX/Kotlin ViewModels with SwiftUI
 kmpObservableViewModel = "1.1.0"
 
-flowmvi = "3.3.0-alpha03"
+flowmvi = "3.4.0"
 
 # Linters, run by the plugins in build-logic
 detekt = "1.23.8"
